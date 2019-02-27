@@ -132,22 +132,30 @@ dev.off()
 join_all_langs = function() {
     lang_short = c("en", "de", "fr", "es")
     lang_long = c("english", "german", "french", "spanish")
+    model_str = "DSE_sg"
 
     data = list()
     for (i in 1:4) {
         lang1 = lang_short[i]
         lang2 = lang_long[i]
         year_file = paste0("results/1gram_first_year_", lang2, ".txt")
+        hw_file = paste0("results/wiki", lang1, "_", model_str, "_wll7_mc5_iter5_t1_h.txt")
         vocab_file = paste0("results/wiki", lang1, "_wll7_mc5_vocab.csv")
 
         d1 = fread(year_file)
         setnames(d1, c('word', 'year'))
         setkey(d1, word)
 
+        # Include lower case words
+        d1_lower = copy(d1)
+        d1_lower[, word := str_to_lower(word)]
+        d1_ext = unique(rbindlist(list(d1, d1_lower)))
+        setkey(d1_ext, word)
+
         d2 = fread(hw_file, skip=2)
         setnames(d2, c('word', 'hw', 'hc'))
         setkey(d2, word)
-        d12j = d1[d2,nomatch=0]
+        d12j = d1_ext[d2,nomatch=0]
 
         d3 = fread(vocab_file)
         d3$V2 = NULL
@@ -166,4 +174,8 @@ d_all_langs = join_all_langs()
 
 p = ggplot(d_all_langs[ngramCount >= 2 & ngramCount <= 7], aes(x=year, y=hw, color=wordLen, fill=wordLen)) +
     geom_smooth() + theme_bw() + facet_wrap(~Language) + 
-    guides(fill=guide_legend(title="Ngram count"), color=guide_legend(title="Ngram count"))
+    guides(fill=guide_legend(title="Ngram count"), color=guide_legend(title="Ngram count")) + 
+    labs(x='First-appearance-year of the word', y=expression(h^w))
+pdf("figs/hw_year_ngramCount2to7_DSE_sg_wikiAllLangs.pdf", 8, 7)
+plot(p)
+dev.off()
