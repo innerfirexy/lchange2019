@@ -130,12 +130,12 @@ dev.off()
 ###############################
 # Joint data from all languages
 join_all_langs = function() {
-    lang_short = c("en", "de", "fr", "es")
-    lang_long = c("english", "german", "french", "spanish")
+    lang_short = c("en", "de", "fr", "it", "es")
+    lang_long = c("english", "german", "french", "italian", "spanish")
     model_str = "DSE_sg"
 
     data = list()
-    for (i in 1:4) {
+    for (i in 1:5) {
         lang1 = lang_short[i]
         lang2 = lang_long[i]
         year_file = paste0("results/1gram_first_year_", lang2, ".txt")
@@ -174,8 +174,10 @@ d_all_langs = join_all_langs()
 
 p = ggplot(d_all_langs[ngramCount >= 2 & ngramCount <= 7], aes(x=year, y=hw, color=wordLen, fill=wordLen)) +
     geom_smooth() + theme_bw() + facet_wrap(~Language) + 
+    scale_fill_brewer(palette="Blues") + scale_color_brewer(palette="Blues") + 
+    # scale_colour_gradient() + scale_fill_gradient() + 
     guides(fill=guide_legend(title="Ngram count"), color=guide_legend(title="Ngram count")) + 
     labs(x='First-appearance-year of the word', y=expression(h^w))
-pdf("figs/hw_year_ngramCount2to7_DSE_sg_wikiAllLangs.pdf", 8, 7)
+pdf("figs/hw_year_ngramCount2to7_DSE_sg_wikiAllLangs.pdf", 10, 7)
 plot(p)
 dev.off()
