@@ -13,13 +13,13 @@ library(optparse)
 node_name = Sys.info()[4]
 if (node_name == 'COS-CS-E050971') {
     # setwd('/Users/xy/academic_projects/zhwiki')
-    setwd('/Users/xy/academic_projects/cogsci2019repo') # laptop
+    setwd('/Users/xy/academic_projects/acl2019repo') # laptop
 } else if (node_name == 'dreitter-cent.ist.local') {
     setwd('/home/yangxu/projects/zhwiki')
 } else if (node_name == 'COS-CS-E051358') {
-    setwd('/home/yxu-admin/projects/cogsci2019repo')
+    setwd('/home/yxu-admin/projects/acl2019repo')
 } else if(node_name == 'COS-CS-E050970') {
-    setwd('/Users/xy/academic_projects/cogsci2019repo') # dream
+    setwd('/Users/xy/academic_projects/acl2019repo') # dream
 }
 
 # Take one argument, i.e., the _h file as input
@@ -62,19 +62,11 @@ d3 = d3[d_year, nomatch=0]
 #########
 # Models
 
-# all words
-m1 = lm(hw ~ freq + year, d3)
+# Direct model
+m1 = lm(hw ~ freq + year, d3[ngramNum>1])
 summary(m1)
 
-m2 = lm(hw ~ freq, d3)
-m2_res = lm(residuals(m2) ~ year, d3)
+# Auxiliary model
+m2 = lm(hw ~ freq, d3[ngramNum>1])
+m2_res = lm(residuals(m2) ~ year, d3[ngramNum>1])
 summary(m2_res)
-
-
-# Multi-ngram words
-m3 = lm(hw ~ freq + year, d3[ngramNum>=3])
-summary(m3)
-
-# m4 = lm(hw ~ freq, d3[ngramNum>1])
-# m4_res = lm(residuals(m4) ~ year, d3[ngramNum>1])
-# summary(m4_res)

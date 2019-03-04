@@ -129,10 +129,10 @@ dev.off()
 
 ###############################
 # Joint data from all languages
-join_all_langs = function() {
+join_all_langs = function(model="DSE_sg") {
     lang_short = c("en", "de", "fr", "it", "es")
     lang_long = c("english", "german", "french", "italian", "spanish")
-    model_str = "DSE_sg"
+    model_str = model
 
     data = list()
     for (i in 1:5) {
@@ -170,14 +170,19 @@ join_all_langs = function() {
     rbindlist(data)
 }
 
-d_all_langs = join_all_langs()
+d_sg = join_all_langs(model="DSE_sg")
+d_sg$Model = "DSE-SG"
 
-p = ggplot(d_all_langs[ngramCount >= 2 & ngramCount <= 7], aes(x=year, y=hw, color=wordLen, fill=wordLen)) +
+d_cbow = join_all_langs(model="DSE_cbow")
+d_cbow$Model = "DSE-CBOW"
+
+p = ggplot(d_sg[ngramCount >= 2 & ngramCount <= 7], aes(x=year, y=hw, color=wordLen, fill=wordLen)) +
     geom_smooth() + theme_bw() + facet_wrap(~Language) + 
     scale_fill_brewer(palette="Blues") + scale_color_brewer(palette="Blues") + 
     # scale_colour_gradient() + scale_fill_gradient() + 
     guides(fill=guide_legend(title="Ngram count"), color=guide_legend(title="Ngram count")) + 
+    theme(legend.position=c(0.8, 0.2)) + 
     labs(x='First-appearance-year of the word', y=expression(h^w))
-pdf("figs/hw_year_ngramCount2to7_DSE_sg_wikiAllLangs.pdf", 10, 7)
+pdf("figs/hw_year_ngramCount2to7_DSE_sg_wikiAllLangs.pdf", 9, 6)
 plot(p)
 dev.off()
